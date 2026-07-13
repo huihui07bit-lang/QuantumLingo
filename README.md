@@ -24,10 +24,12 @@
 
 ```
 QuantumLingo/
-├── backend/              # FastAPI 后端 + QNLP 逻辑
-│   └── requirements.txt
-├── frontend/             # 前端界面
-│   └── index.html
+├── backend/                 # 后端
+│   ├── main.py              # FastAPI 入口，提供 API 接口
+│   ├── quantum_core.py      # QNLP 核心逻辑（lambeq + PennyLane）
+│   └── requirements.txt     # 后端依赖
+├── frontend/
+│   └── index.html           # 前端界面
 ├── .gitignore
 └── README.md
 ```
@@ -58,17 +60,16 @@ uvicorn main:app --reload
 ```
 
 > 后端默认运行在 `http://127.0.0.1:8000`
-> API 文档：`http://127.0.0.1:8000/docs`
+> API 文档（自动生成）：`http://127.0.0.1:8000/docs`
 
 ### 3. 打开前端
 
-直接用浏览器打开 `frontend/index.html` 即可。
+直接用浏览器打开 `frontend/index.html` 即可访问界面。
 
 ## 📝 使用示例
 
-在页面输入一句话（如 `Alice loves Bob`），QuantumLingo 会返回对应的量子线路结果。
+在页面输入一句话（如 `Alice loves Bob`），QuantumLingo 会将其解析为量子线路并返回结果。
 
 ## 📄 License
 
 MIT
-```
