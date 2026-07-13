@@ -1,49 +1,74 @@
 # QuantumLingo 🔮
 
-将自然语言描述自动转换为量子线路，并进行可视化展示。
+将自然语言自动转换为量子线路的 **量子自然语言处理（QNLP）** 项目。
+输入一句话，QuantumLingo 会基于范畴语法将其解析并编码为量子线路，进行可视化与量子计算模拟。
 
 ## ✨ 功能特性
 
-- 输入自然语言描述，自动生成对应的量子线路
-- 量子线路可视化展示
-- 前后端分离架构
+- 🗣️ 输入自然语言句子，自动生成对应的量子线路
+- ⚛️ 基于 lambeq 的范畴语法（DisCoCat）建模
+- 🔬 使用 PennyLane 进行量子线路模拟
+- 🌐 FastAPI 提供 RESTful 接口，浏览器即可访问
 
 ## 🛠️ 技术栈
 
-- **后端**: Python
-- **前端**: (请补充，如 React / Vue / 原生 JS)
-- **量子计算**: (请补充，如 Qiskit / PennyLane)
+| 层级 | 技术 |
+|------|------|
+| 后端框架 | FastAPI + Uvicorn |
+| QNLP 核心 | lambeq |
+| 量子计算 | PennyLane |
+| 科学计算 | NumPy |
+| 前端 | 原生 HTML |
 
 ## 📁 项目结构
 
-​```
+```
 QuantumLingo/
-├── backend/     # 后端服务
-├── frontend/    # 前端界面
+├── backend/              # FastAPI 后端 + QNLP 逻辑
+│   └── requirements.txt
+├── frontend/             # 前端界面
+│   └── index.html
+├── .gitignore
 └── README.md
-​```
+```
 
 ## 🚀 快速开始
 
-### 后端
+### 1. 克隆项目
 
-​```bash
+```bash
+git clone https://github.com/huihui07bit-lang/QuantumLingo.git
+cd QuantumLingo
+```
+
+### 2. 启动后端
+
+```bash
 cd backend
+
+# 创建并激活虚拟环境
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# 安装依赖
 pip install -r requirements.txt
-python app.py
-​```
 
-### 前端
+# 启动服务
+uvicorn main:app --reload
+```
 
-​```bash
-cd frontend
-# 启动命令（请补充）
-​```
+> 后端默认运行在 `http://127.0.0.1:8000`
+> API 文档：`http://127.0.0.1:8000/docs`
+
+### 3. 打开前端
+
+直接用浏览器打开 `frontend/index.html` 即可。
 
 ## 📝 使用示例
 
-（在这里放一张运行截图或示例）
+在页面输入一句话（如 `Alice loves Bob`），QuantumLingo 会返回对应的量子线路结果。
 
 ## 📄 License
 
 MIT
+```
