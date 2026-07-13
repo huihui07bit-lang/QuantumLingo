@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>QuantumLingo · 量子语言解析器</title>
+  <style>
+    body {
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      background: #0a0e27;
+      color: #e0e0ff;
+      margin: 0; padding: 40px;
+    }
+    h1 { text-align: center; color: #7df9ff; letter-spacing: 2px; }
+    .sub { text-align: center; color: #8899cc; margin-bottom: 30px; }
+    .box {
+      max-width: 900px; margin: 0 auto;
+      background: #141a3a; border-radius: 12px; padding: 30px;
+      box-shadow: 0 0 30px rgba(125,249,255,0.15);
+    }
+    input {
+      width: 70%; padding: 12px; font-size: 16px;
+      border: 1px solid #3a4a8a; border-radius: 8px;
+      background: #0a0e27; color: #fff;
+    }
+    button {
+      padding: 12px 24px; font-size: 16px; margin-left: 10px;
+      background: #7df9ff; color: #0a0e27; border: none;
+      border-radius: 8px; cursor: pointer; font-weight: bold;
+    }
+    button:hover { background: #a0fbff; }
+    .words { margin: 25px 0; display: flex; gap: 12px; flex-wrap: wrap; }
+    .word {
+      background: #1e2a5a; padding: 10px 16px; border-radius: 8px;
+      border: 1px solid #3a4a8a;
+    }
+    .word .w { font-size: 18px; color: #fff; }
+    .word .t { font-size: 12px; color: #7df9ff; font-family: monospace; }
+    svg { background: #0a0e27; border-radius: 8px; margin-top: 15px; width: 100%; }
+    .label { color: #7df9ff; font-weight: bold; margin-top: 20px; }
+    .mode { text-align: right; color: #8899cc; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>⚛️ QuantumLingo</h1>
+  <p class="sub">把自然语言编译成量子线路</p>
+
+  <div class="box">
+    <div>
+      <input id="sentence" value="Alice loves Bob" placeholder="输入英文句子..." />
+      <button onclick="run()">解析 →</button>
+    </div>
+
+    <div id="output" style="display:none;">
+      <div class="mode" id="mode"></div>
+      <div class="label">📖 语法结构</div>
+      <div class="words" id="words"></div>
+      <div class="label">⚛️ 量子线路</div>
+      <svg id="circuit" height="200"></svg>
+    </div>
+  </div>
+
+  <script>
+    const API = "http://localhost:8000/parse";
+
+    async function run() {
+      const sentence = document.getElementById("sentence").value;
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sentence })
+      });
+      const data = await res.json();
+      render(data);
+    }
+
+    function render(data) {
+      document.getElementById("output").style.display = "block";
+      document.getElementById("mode").textContent = "引擎模式: " + data.mode;
+
+      // 语法词块
+      const wc = document.getElementById("words");
+      wc.innerHTML = "";
+      data.words.forEach(w => {
+        const d = document.createElement("div");
+        d.className = "word";
+        d.innerHTML = `<div class="w">${w.word}</div><div class="t">${w.type}</div>`;
+        wc.appendChild(d);
+      });
+
+      // 量子线路可视化
+      drawCircuit(data.circuit);
+    }
+
+    function drawCircuit(circuit) {
+      const svg = document.getElementById("circuit");
+      const n = circuit.qubits;
+      const rowH = 50, startX = 60, stepX = 90;
+      const gates = circuit.gates;
+      const width = startX + (gates.length + 1) * stepX;
+      svg.setAttribute("height", n * rowH + 40);
+      svg.setAttribute("viewBox", `0 0 ${width} ${n * rowH + 40}`);
+      let s = "";
+
+      // 每条 qubit 横线
+      for (let i = 0; i < n; i++) {
+        const y = 30 + i * rowH;
+        s += `<line x1="${startX}" y1="${y}" x2="${width - 20}" y2="${y}" stroke="#3a4a8a" stroke-width="2"/>`;
+        s += `<text x="20" y="${y + 5}" fill="#7df9ff" font-size="14">q${i}</text>`;
+      }
+
+      // 逐个画门
+      let col = 1;
+      gates.forEach(g => {
+        const x = startX + col * stepX;
+        if (g.gate === "CNOT") {
+          const yc = 30 + g.control * rowH, yt = 30 + g.target * rowH;
+          s += `<line x1="${x}" y1="${yc}" x2="${x}" y2="${yt}" stroke="#ff7df9" stroke-width="2"/>`;
+          s += `<circle cx="${x}" cy="${yc}" r="5" fill="#ff7df9"/>`;
+          s += `<circle cx="${x}" cy="${yt}" r="12" fill="none" stroke="#ff7df9" stroke-width="2"/>`;
+          s += `<line x1="${x-12}" y1="${yt}" x2="${x+12}" y2="${yt}" stroke="#ff7df9" stroke-width="2"/>`;
+        } else {
+          const y = 30 + g.qubit * rowH;
+          const color = g.gate === "H" ? "#7df9ff" : "#f9df7d";
+          s += `<rect x="${x-18}" y="${y-18}" width="36" height="36" rx="6" fill="${color}"/>`;
+          s += `<text x="${x}" y="${y+5}" fill="#0a0e27" font-size="14" font-weight="bold" text-anchor="middle">${g.gate}</text>`;
+        }
+        col++;
+      });
+
+      svg.innerHTML = s;
+    }
+
+    // 页面加载自动跑一次
+    run();
+  </script>
+</body>
+</html>
